@@ -174,10 +174,13 @@ impl TryFrom<u8> for Unsaturation {
     }
 }
 
+pub mod display;
+pub mod polars;
+
 #[cfg(test)]
 mod test {
     use super::*;
-    use crate::display::{COMMON, DisplayWithOptions};
+    use crate::fatty_acid::display::{COMMON, DisplayWithOptions};
 
     #[test]
     fn test() {

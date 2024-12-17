@@ -1,4 +1,4 @@
-use crate::polars::series::{SeriesExt as _, fatty_acids::FattyAcidSeries};
+use super::series::{FattyAcidSeries, SeriesExt as _};
 use polars::prelude::*;
 
 /// Extension methods for [`Column`]

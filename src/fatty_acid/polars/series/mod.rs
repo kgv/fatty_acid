@@ -1,5 +1,17 @@
-use crate::fatty_acid::{FattyAcid, Unsaturated};
+use self::unsaturated::UnsaturatedSeries;
+use crate::fatty_acid::FattyAcid;
 use polars::prelude::*;
+
+/// Extension methods for [`Series`]
+pub trait SeriesExt {
+    fn fatty_acid(&self) -> FattyAcidSeries;
+}
+
+impl SeriesExt for Series {
+    fn fatty_acid(&self) -> FattyAcidSeries {
+        FattyAcidSeries::new(self).expect(r#"Expected "FattyAcid" series"#)
+    }
+}
 
 /// Fatty acid series
 #[derive(Clone, Debug)]
@@ -55,44 +67,4 @@ impl FattyAcidSeries {
     }
 }
 
-/// Unsaturated series
-#[derive(Clone, Debug)]
-pub struct UnsaturatedSeries {
-    pub index: Series,
-    pub isomerism: Series,
-    pub unsaturation: Series,
-}
-
-impl UnsaturatedSeries {
-    pub fn new(series: &Series) -> PolarsResult<Self> {
-        let r#struct = series.struct_()?;
-        let index = r#struct.field_by_name("Index")?;
-        let isomerism = r#struct.field_by_name("Isomerism")?;
-        let unsaturation = r#struct.field_by_name("Unsaturation")?;
-        Ok(Self {
-            index,
-            isomerism,
-            unsaturation,
-        })
-    }
-
-    pub fn len(&self) -> usize {
-        self.index.len()
-    }
-
-    pub fn get(&self, index: usize) -> PolarsResult<Unsaturated> {
-        Ok(Unsaturated {
-            index: self.index.u8()?.get(index),
-            isomerism: self
-                .isomerism
-                .i8()?
-                .get(index)
-                .and_then(|isomerism| isomerism.try_into().ok()),
-            unsaturation: self
-                .unsaturation
-                .u8()?
-                .get(index)
-                .and_then(|unsaturation| unsaturation.try_into().ok()),
-        })
-    }
-}
+pub mod unsaturated;

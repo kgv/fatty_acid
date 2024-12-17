@@ -13,3 +13,5 @@ impl ExprExt for Expr {
 }
 
 pub mod fatty_acid;
+pub mod filter;
+pub mod find;
