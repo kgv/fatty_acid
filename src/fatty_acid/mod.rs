@@ -92,10 +92,10 @@ impl FattyAcid {
         }
     }
 
-    fn sort(&mut self) {
-        self.unsaturated
-            .sort_by_cached_key(|bound| (bound.unsaturation, bound.isomerism, bound.index));
-    }
+    // fn sort(&mut self) {
+    //     self.unsaturated
+    //         .sort_by_cached_key(|bound| (bound.unsaturation, bound.isomerism, bound.index));
+    // }
 }
 
 impl FattyAcid {
