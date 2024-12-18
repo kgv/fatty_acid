@@ -71,7 +71,6 @@ pub trait FattyAcidExt {
         self.u() == 0
     }
 
-    /// Bounds
     fn b(&self) -> u8;
 
     /// Unsaturated bounds
@@ -99,12 +98,38 @@ impl FattyAcid {
     }
 }
 
-impl FattyAcidExt for &FattyAcid {
-    fn b(&self) -> u8 {
+impl FattyAcid {
+    /// Carbons
+    pub fn carbons(&self) -> u8 {
+        self.carbons
+    }
+
+    /// Hydrogens
+    ///
+    /// `H = 2C - 2U`
+    pub fn hydrogens(&self) -> u8 {
+        2 * self.carbons() - 2 * self.unsaturated()
+    }
+
+    /// Bounds
+    ///
+    /// The number of bonds.
+    pub fn bounds(&self) -> u8 {
         self.carbons.saturating_sub(1)
     }
 
-    fn u(&self) -> u8 {
+    /// Unsaturated
+    ///
+    /// The number of unsaturated bonds.
+    pub fn unsaturated(&self) -> u8 {
+        self.unsaturated
+            .iter()
+            .filter(|unsaturated| unsaturated.unsaturation.is_some())
+            .count() as _
+    }
+
+    /// Unsaturation
+    pub fn unsaturation(&self) -> u8 {
         self.unsaturated.iter().fold(0, |sum, bound| {
             match bound.unsaturation.unwrap_or_default() {
                 Unsaturation::One => sum + 1,
