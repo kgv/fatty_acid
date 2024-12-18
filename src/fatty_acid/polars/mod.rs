@@ -35,7 +35,7 @@ impl SchemaExt for Schema {
     }
 }
 
-pub mod column;
-pub mod data_frame;
-pub mod expr;
-pub mod series;
+mod column;
+mod data_frame;
+mod expr;
+mod series;
