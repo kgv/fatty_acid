@@ -40,8 +40,8 @@ pub const C28U0: FattyAcid = FattyAcid::new(28);
 pub const C30U0: FattyAcid = FattyAcid::new(30);
 pub const C32U0: FattyAcid = FattyAcid::new(32);
 
-/// Fatty acid
-pub trait FattyAcidExt {
+/// Fatty acid short
+pub trait Short {
     /// Carbon
     fn c(&self) -> u8 {
         self.b() + 1
@@ -77,6 +77,61 @@ pub trait FattyAcidExt {
     fn u(&self) -> u8;
 }
 
+/// Extension methods for [`FattyAcid`]
+pub trait FattyAcidExt {
+    type Output;
+
+    /// Carbons
+    fn carbons(&self) -> Self::Output;
+
+    /// Hydrogens
+    ///
+    /// `H = 2C - 2U`
+    fn hydrogens(&self) -> Self::Output;
+
+    /// Bounds
+    ///
+    /// The number of bonds.
+    fn bounds(&self) -> Self::Output;
+
+    /// Saturated
+    ///
+    /// The number of saturated bonds.
+    fn saturated(&self) -> Self::Output;
+
+    /// Unsaturated
+    ///
+    /// The number of unsaturated bonds.
+    fn unsaturated(&self) -> Self::Output;
+}
+
+impl FattyAcidExt for FattyAcid {
+    type Output = u8;
+
+    fn carbons(&self) -> Self::Output {
+        self.carbons
+    }
+
+    fn hydrogens(&self) -> Self::Output {
+        2 * self.carbons - 2 * self.unsaturated()
+    }
+
+    fn bounds(&self) -> Self::Output {
+        self.carbons.saturating_sub(1)
+    }
+
+    fn saturated(&self) -> Self::Output {
+        self.bounds() - self.unsaturated()
+    }
+
+    fn unsaturated(&self) -> Self::Output {
+        self.unsaturated
+            .iter()
+            .filter(|unsaturated| unsaturated.unsaturation.is_some())
+            .count() as _
+    }
+}
+
 /// Fatty acid
 #[derive(Clone, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
 pub struct FattyAcid {
@@ -91,43 +146,9 @@ impl FattyAcid {
             unsaturated: Vec::new(),
         }
     }
-
-    // fn sort(&mut self) {
-    //     self.unsaturated
-    //         .sort_by_cached_key(|bound| (bound.unsaturation, bound.isomerism, bound.index));
-    // }
 }
 
 impl FattyAcid {
-    /// Carbons
-    pub fn carbons(&self) -> u8 {
-        self.carbons
-    }
-
-    /// Hydrogens
-    ///
-    /// `H = 2C - 2U`
-    pub fn hydrogens(&self) -> u8 {
-        2 * self.carbons() - 2 * self.unsaturated()
-    }
-
-    /// Bounds
-    ///
-    /// The number of bonds.
-    pub fn bounds(&self) -> u8 {
-        self.carbons.saturating_sub(1)
-    }
-
-    /// Unsaturated
-    ///
-    /// The number of unsaturated bonds.
-    pub fn unsaturated(&self) -> u8 {
-        self.unsaturated
-            .iter()
-            .filter(|unsaturated| unsaturated.unsaturation.is_some())
-            .count() as _
-    }
-
     /// Unsaturation
     pub fn unsaturation(&self) -> u8 {
         self.unsaturated.iter().fold(0, |sum, bound| {
