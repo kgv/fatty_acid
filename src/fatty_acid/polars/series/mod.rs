@@ -48,9 +48,9 @@ impl FattyAcidSeries {
         };
         unsaturated.sort_by_cached_key(|unsaturated| {
             (
-                unsaturated.unsaturation,
                 unsaturated.index,
                 unsaturated.isomerism,
+                unsaturated.unsaturation,
             )
         });
         Ok(Some(FattyAcid {
